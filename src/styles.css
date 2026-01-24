@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  /* Dark theme - Slate based */
+  --color-background: oklch(15% 0.01 260);
+  --color-foreground: oklch(95% 0 0);
+  --color-card: oklch(20% 0.01 260);
+  --color-card-foreground: oklch(95% 0 0);
+  --color-primary: oklch(55% 0.15 250);
+  --color-primary-foreground: oklch(98% 0 0);
+  --color-secondary: oklch(25% 0.01 260);
+  --color-secondary-foreground: oklch(90% 0 0);
+  --color-muted: oklch(25% 0.01 260);
+  --color-muted-foreground: oklch(60% 0 0);
+  --color-accent: oklch(30% 0.01 260);
+  --color-accent-foreground: oklch(90% 0 0);
+  --color-destructive: oklch(55% 0.25 25);
+  --color-destructive-foreground: oklch(98% 0 0);
+  --color-border: oklch(30% 0.01 260);
+  --color-input: oklch(25% 0.01 260);
+  --color-ring: oklch(55% 0.15 250);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+  body {
+    background: linear-gradient(180deg, oklch(12% 0.02 260) 0%, oklch(18% 0.01 260) 50%, oklch(12% 0.02 260) 100%);
+    background-attachment: fixed;
+    color: var(--color-foreground);
+  }
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: oklch(20% 0.01 260);
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(35% 0.01 260);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(40% 0.01 260);
+}

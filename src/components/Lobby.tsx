@@ -133,7 +133,7 @@ export function Lobby({ serverUrl, onJoinMatch }: LobbyProps) {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-6">
+    <div className="w-full max-w-md mx-auto space-y-6 px-4 sm:px-0">
       {/* Title */}
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold">

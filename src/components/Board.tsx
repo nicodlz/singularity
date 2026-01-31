@@ -1145,11 +1145,19 @@ function BuildingPopup({ x, y, tileId, player, onBuild, onClose }: {
     );
   };
 
-  // Adjust position to stay on screen
-  const popupWidth = 200;
+  // Mobile: center popup, Desktop: position near click
+  const isMobile = window.innerWidth < 640;
+  const popupWidth = isMobile ? 'auto' : 200;
   const popupHeight = 320;
-  const adjustedX = Math.min(x, window.innerWidth - popupWidth - 20);
-  const adjustedY = Math.min(y, window.innerHeight - popupHeight - 20);
+  
+  let adjustedX, adjustedY;
+  if (isMobile) {
+    adjustedX = '50%';
+    adjustedY = '50%';
+  } else {
+    adjustedX = Math.min(x, window.innerWidth - 200 - 20);
+    adjustedY = Math.min(y, window.innerHeight - popupHeight - 20);
+  }
 
   return (
     <>
@@ -1158,8 +1166,12 @@ function BuildingPopup({ x, y, tileId, player, onBuild, onClose }: {
 
       {/* Popup */}
       <div
-        className="fixed z-50 bg-[#1a1a2e] border border-emerald-700 rounded-lg shadow-xl p-2"
-        style={{ left: adjustedX, top: adjustedY, width: popupWidth }}
+        className={`fixed z-50 bg-[#1a1a2e] border border-emerald-700 rounded-lg shadow-xl p-2 ${
+          isMobile 
+            ? 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 max-w-[90vw] max-h-[90vh] overflow-auto' 
+            : ''
+        }`}
+        style={isMobile ? {} : { left: adjustedX, top: adjustedY, width: popupWidth }}
       >
         <div className="flex justify-between items-center mb-2 pb-1 border-b border-gray-700">
           <span className="text-xs font-semibold text-emerald-400">Construire sur T{tileId}</span>
@@ -1209,11 +1221,19 @@ function ProbePopup({ x, y, tileId, tile, probesOnTile, playerEnergy, onRecall, 
   const probeCount = probesOnTile.length;
   const maxRecallable = Math.min(probeCount, playerEnergy);
 
-  // Adjust position to stay on screen
+  // Mobile: center popup, Desktop: position near click
+  const isMobile = window.innerWidth < 640;
   const popupWidth = 180;
   const popupHeight = 160;
-  const adjustedX = Math.min(Math.max(10, x - popupWidth / 2), window.innerWidth - popupWidth - 10);
-  const adjustedY = Math.min(y + 20, window.innerHeight - popupHeight - 10);
+  
+  let adjustedX, adjustedY;
+  if (isMobile) {
+    adjustedX = '50%';
+    adjustedY = '50%';
+  } else {
+    adjustedX = Math.min(Math.max(10, x - popupWidth / 2), window.innerWidth - popupWidth - 10);
+    adjustedY = Math.min(y + 20, window.innerHeight - popupHeight - 10);
+  }
 
   const handleRecallCount = (count: number) => {
     const probeIds = probesOnTile.slice(0, count).map(p => p.id);
@@ -1227,8 +1247,12 @@ function ProbePopup({ x, y, tileId, tile, probesOnTile, playerEnergy, onRecall, 
 
       {/* Popup */}
       <div
-        className="fixed z-50 bg-[#1a1a2e] border border-cyan-700 rounded-lg shadow-xl p-3"
-        style={{ left: adjustedX, top: adjustedY, width: popupWidth }}
+        className={`fixed z-50 bg-[#1a1a2e] border border-cyan-700 rounded-lg shadow-xl p-3 ${
+          isMobile 
+            ? 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-72 max-w-[90vw] max-h-[90vh] overflow-auto' 
+            : ''
+        }`}
+        style={isMobile ? {} : { left: adjustedX, top: adjustedY, width: popupWidth }}
       >
         <div className="flex justify-between items-center mb-2 pb-2 border-b border-gray-700">
           <span className="text-xs font-semibold text-cyan-400">
@@ -1426,22 +1450,26 @@ function ResourceWithTooltip({ icon, value, label, highlight }: { icon: React.Re
 
 function CompactResourcePanel({ resources }: { resources: { metal: number; organic: number; energy: number; alloy: number; biomass: number; plasma: number; intelligence: number } }) {
   return (
-    <div className="flex items-center gap-1 px-3 sm:px-4 py-2 bg-gray-900/50 rounded-lg border border-gray-800">
-      {/* Raw */}
-      <div className="flex items-center gap-2 sm:gap-4 pr-2 sm:pr-4 border-r border-gray-700">
-        <ResourceWithTooltip icon={<MetalIconSvg size={22} />} value={resources.metal} label="Métal" />
-        <ResourceWithTooltip icon={<OrganicIconSvg size={22} />} value={resources.organic} label="Organique" />
-        <ResourceWithTooltip icon={<EnergyIconSvg size={22} />} value={resources.energy} label="Énergie" highlight />
-      </div>
-      {/* Refined */}
-      <div className="flex items-center gap-2 sm:gap-4 px-2 sm:px-4 border-r border-gray-700">
-        <ResourceWithTooltip icon={<AlloyIconSvg size={22} />} value={resources.alloy} label="Alliage" />
-        <ResourceWithTooltip icon={<BiomassIconSvg size={22} />} value={resources.biomass} label="Biomasse" />
-        <ResourceWithTooltip icon={<PlasmaIconSvg size={22} />} value={resources.plasma} label="Plasma" />
-      </div>
-      {/* Intelligence */}
-      <div className="pl-2 sm:pl-4">
-        <ResourceWithTooltip icon={<IntelligenceIconSvg size={22} />} value={resources.intelligence} label="Intelligence" />
+    <div className="bg-gray-900/50 rounded-lg border border-gray-800 px-3 sm:px-4 py-2">
+      {/* Mobile: Stack in 2 rows, Desktop: Single row */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-1">
+        {/* First row on mobile: Raw + Intelligence */}
+        <div className="flex items-center gap-1 sm:gap-2 justify-between sm:justify-start">
+          <div className="flex items-center gap-1 sm:gap-2 pr-2 sm:pr-4 sm:border-r border-gray-700">
+            <ResourceWithTooltip icon={<MetalIconSvg size={20} />} value={resources.metal} label="Métal" />
+            <ResourceWithTooltip icon={<OrganicIconSvg size={20} />} value={resources.organic} label="Organique" />
+            <ResourceWithTooltip icon={<EnergyIconSvg size={20} />} value={resources.energy} label="Énergie" highlight />
+          </div>
+          <div className="sm:pl-2 sm:border-l border-gray-700 sm:ml-auto">
+            <ResourceWithTooltip icon={<IntelligenceIconSvg size={20} />} value={resources.intelligence} label="Intelligence" />
+          </div>
+        </div>
+        {/* Second row on mobile: Refined resources */}
+        <div className="flex items-center justify-between sm:justify-start gap-1 sm:gap-2 sm:px-4 sm:border-r border-gray-700">
+          <ResourceWithTooltip icon={<AlloyIconSvg size={20} />} value={resources.alloy} label="Alliage" />
+          <ResourceWithTooltip icon={<BiomassIconSvg size={20} />} value={resources.biomass} label="Biomasse" />
+          <ResourceWithTooltip icon={<PlasmaIconSvg size={20} />} value={resources.plasma} label="Plasma" />
+        </div>
       </div>
     </div>
   );
@@ -1463,62 +1491,100 @@ function CompactActionPanel({ G, moves, playerID }: { G: BoardProps['G']; moves:
   // Deployment phase
   if (!G.deploymentComplete) {
     return (
-      <div className="w-full flex items-center gap-4 h-14 px-5 bg-amber-950/30 rounded-lg border border-amber-800/50">
-        <span className="text-amber-400 font-semibold">🎲 Déploiement</span>
-        {!G.rolledDice ? (
-          <>
-            <span className="text-sm text-gray-400">{freeProbes.length} sondes libres • {deployedProbes.length} déployées</span>
-            {freeProbes.length > 0 && (
-              <Button size="sm" className="h-9 px-4 bg-amber-600 hover:bg-amber-500" onClick={() => moves.rollProbes()}>
-                🎲 Lancer {freeProbes.length} dés
-              </Button>
+      <div className="w-full bg-amber-950/30 rounded-lg border border-amber-800/50 px-3 sm:px-5 py-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          {/* Header */}
+          <div className="flex items-center justify-between sm:justify-start">
+            <span className="text-amber-400 font-semibold">🎲 Déploiement</span>
+            <Button size="sm" className="h-8 px-3 bg-emerald-600 hover:bg-emerald-500 sm:hidden" onClick={() => moves.endDeployment()}>
+              {G.rolledDice ? 'Terminer →' : 'Build →'}
+            </Button>
+          </div>
+          
+          {/* Content */}
+          <div className="flex items-center gap-2 flex-1">
+            {!G.rolledDice ? (
+              <>
+                <span className="text-xs sm:text-sm text-gray-400 hidden sm:inline">{freeProbes.length} sondes libres • {deployedProbes.length} déployées</span>
+                <span className="text-xs text-gray-400 sm:hidden">{freeProbes.length}/{freeProbes.length + deployedProbes.length}</span>
+                {freeProbes.length > 0 && (
+                  <Button size="sm" className="h-8 px-3 bg-amber-600 hover:bg-amber-500" onClick={() => moves.rollProbes()}>
+                    <span className="hidden sm:inline">🎲 Lancer {freeProbes.length} dés</span>
+                    <span className="sm:hidden">🎲 Lancer</span>
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <span className="text-xs sm:text-sm text-amber-300 hidden sm:inline">Glisse les dés sur les tuiles</span>
+                <span className="text-xs text-amber-300 sm:hidden">Glisse dés</span>
+                <span className="font-bold text-lg text-amber-300">{deployedCount}/{totalDice}</span>
+              </>
             )}
-          </>
-        ) : (
-          <span className="text-sm text-amber-300">Glisse les dés sur les tuiles • <span className="font-bold text-lg">{deployedCount}/{totalDice}</span></span>
-        )}
-        <Button size="sm" className="h-9 px-4 bg-emerald-600 hover:bg-emerald-500 ml-auto" onClick={() => moves.endDeployment()}>
-          {G.rolledDice ? 'Terminer déploiement →' : 'Passer au build →'}
-        </Button>
+          </div>
+          
+          {/* Desktop end button */}
+          <Button size="sm" className="h-9 px-4 bg-emerald-600 hover:bg-emerald-500 hidden sm:flex" onClick={() => moves.endDeployment()}>
+            {G.rolledDice ? 'Terminer déploiement →' : 'Passer au build →'}
+          </Button>
+        </div>
       </div>
     );
   }
 
   // Construction phase
   return (
-    <div className="w-full flex items-center gap-4 h-14 px-5 bg-emerald-950/30 rounded-lg border border-emerald-800/50">
-      <span className="text-emerald-400 font-semibold">🔨 Construction</span>
-
-      {/* Activate buildings */}
-      {activatable.length > 0 && (
-        <div className="flex items-center gap-1">
-          {activatable.slice(0, 4).map(b => (
-            <Button key={b.id} size="sm" variant="outline" className="h-8 text-xs px-3"
-              onClick={() => moves.activateBuilding(b.id)} disabled={player.resources.energy < 1}>
-              ⚡ {ACTIVATABLE_NAMES[b.type]}
-            </Button>
-          ))}
+    <div className="w-full bg-emerald-950/30 rounded-lg border border-emerald-800/50 px-3 sm:px-5 py-3">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+        {/* Header + Mobile end button */}
+        <div className="flex items-center justify-between sm:justify-start">
+          <span className="text-emerald-400 font-semibold">🔨 Construction</span>
+          <Button size="sm" className="h-8 px-3 bg-cyan-600 hover:bg-cyan-500 sm:hidden" onClick={() => moves.endTurn()}>
+            Fin tour →
+          </Button>
         </div>
-      )}
 
-      {/* Build probe */}
-      <Button size="sm" variant="outline" className="h-8 px-3" onClick={() => moves.buildProbe()}
-        disabled={player.probes.length >= 12 || player.resources.alloy < 1 || player.resources.organic < 1}>
-        + Sonde
-      </Button>
+        {/* Actions */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Activate buildings */}
+          {activatable.length > 0 && (
+            <div className="flex items-center gap-1 flex-wrap">
+              {activatable.slice(0, 3).map(b => (
+                <Button key={b.id} size="sm" variant="outline" className="h-8 text-xs px-2"
+                  onClick={() => moves.activateBuilding(b.id)} disabled={player.resources.energy < 1}>
+                  <span className="hidden sm:inline">⚡ {ACTIVATABLE_NAMES[b.type]}</span>
+                  <span className="sm:hidden">⚡{ACTIVATABLE_NAMES[b.type].slice(0, 3)}</span>
+                </Button>
+              ))}
+              {activatable.length > 3 && (
+                <span className="text-xs text-gray-500">+{activatable.length - 3}</span>
+              )}
+            </div>
+          )}
 
-      {/* Status */}
-      {hasFactory && controlledTiles.length > 0 ? (
-        <span className="text-sm text-emerald-300">💡 Clique sur une tuile contrôlée pour construire</span>
-      ) : !hasFactory ? (
-        <span className="text-sm text-red-400">⚠️ Usine requise pour construire</span>
-      ) : (
-        <span className="text-sm text-yellow-400">⚠️ Contrôle une tuile d'abord</span>
-      )}
+          {/* Build probe */}
+          <Button size="sm" variant="outline" className="h-8 px-3" onClick={() => moves.buildProbe()}
+            disabled={player.probes.length >= 12 || player.resources.alloy < 1 || player.resources.organic < 1}>
+            + Sonde
+          </Button>
+        </div>
 
-      <Button size="sm" className="h-9 px-4 bg-cyan-600 hover:bg-cyan-500 ml-auto" onClick={() => moves.endTurn()}>
-        Fin du tour →
-      </Button>
+        {/* Status - Hide on very small screens */}
+        <div className="hidden sm:block flex-1">
+          {hasFactory && controlledTiles.length > 0 ? (
+            <span className="text-sm text-emerald-300">💡 Clique sur une tuile contrôlée pour construire</span>
+          ) : !hasFactory ? (
+            <span className="text-sm text-red-400">⚠️ Usine requise pour construire</span>
+          ) : (
+            <span className="text-sm text-yellow-400">⚠️ Contrôle une tuile d'abord</span>
+          )}
+        </div>
+
+        {/* Desktop end button */}
+        <Button size="sm" className="h-9 px-4 bg-cyan-600 hover:bg-cyan-500 hidden sm:flex" onClick={() => moves.endTurn()}>
+          Fin du tour →
+        </Button>
+      </div>
     </div>
   );
 }

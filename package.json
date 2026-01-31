@@ -6,16 +6,18 @@
   "scripts": {
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
     "client:dev": "vite",
-    "server:build": "esbuild src/server.ts --bundle --platform=node --format=cjs --outfile=dist/server.cjs --external:node-persist --external:better-sqlite3 --external:pg",
+    "server:build": "esbuild src/server.ts --bundle --platform=node --format=cjs --outfile=dist/server.cjs --external:node-persist --external:better-sqlite3 --external:pg --external:koa-static",
     "server:dev": "npm run server:build && node --watch dist/server.cjs",
     "build": "tsc && vite build && npm run server:build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
+    "@types/koa-static": "^4.0.4",
     "boardgame.io": "^0.50.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "koa-static": "^5.0.0",
     "konva": "^10.2.0",
     "lucide-react": "^0.562.0",
     "react": "^18.3.1",

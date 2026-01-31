@@ -10738,11 +10738,11 @@ var require_mime_types = __commonJS({
       }
       return exts[0];
     }
-    function lookup(path) {
-      if (!path || typeof path !== "string") {
+    function lookup(path2) {
+      if (!path2 || typeof path2 !== "string") {
         return false;
       }
-      var extension2 = extname("x." + path).toLowerCase().substr(1);
+      var extension2 = extname("x." + path2).toLowerCase().substr(1);
       if (!extension2) {
         return false;
       }
@@ -14529,10 +14529,10 @@ var require_request = __commonJS({
        * @param {String} path
        * @api public
        */
-      set path(path) {
+      set path(path2) {
         const url = parse(this.req);
-        if (url.pathname === path) return;
-        url.pathname = path;
+        if (url.pathname === path2) return;
+        url.pathname = path2;
         url.path = null;
         this.url = stringify(url);
       },
@@ -15885,7 +15885,7 @@ var require_dist = __commonJS({
       var result = [];
       var key = 0;
       var i = 0;
-      var path = "";
+      var path2 = "";
       var tryConsume = function(type) {
         if (i < tokens.length && tokens[i].type === type)
           return tokens[i++].value;
@@ -15930,12 +15930,12 @@ var require_dist = __commonJS({
         if (name || pattern) {
           var prefix = char || "";
           if (prefixes.indexOf(prefix) === -1) {
-            path += prefix;
+            path2 += prefix;
             prefix = "";
           }
-          if (path) {
-            result.push(path);
-            path = "";
+          if (path2) {
+            result.push(path2);
+            path2 = "";
           }
           result.push({
             name: name || key++,
@@ -15948,12 +15948,12 @@ var require_dist = __commonJS({
         }
         var value = char || tryConsume("ESCAPED_CHAR");
         if (value) {
-          path += value;
+          path2 += value;
           continue;
         }
-        if (path) {
-          result.push(path);
-          path = "";
+        if (path2) {
+          result.push(path2);
+          path2 = "";
         }
         var open = tryConsume("OPEN");
         if (open) {
@@ -15994,11 +15994,11 @@ var require_dist = __commonJS({
         }
       });
       return function(data) {
-        var path = "";
+        var path2 = "";
         for (var i = 0; i < tokens.length; i++) {
           var token = tokens[i];
           if (typeof token === "string") {
-            path += token;
+            path2 += token;
             continue;
           }
           var value = data ? data[token.name] : void 0;
@@ -16018,7 +16018,7 @@ var require_dist = __commonJS({
               if (validate && !matches[i].test(segment)) {
                 throw new TypeError('Expected all "'.concat(token.name, '" to match "').concat(token.pattern, '", but got "').concat(segment, '"'));
               }
-              path += token.prefix + segment + token.suffix;
+              path2 += token.prefix + segment + token.suffix;
             }
             continue;
           }
@@ -16027,7 +16027,7 @@ var require_dist = __commonJS({
             if (validate && !matches[i].test(segment)) {
               throw new TypeError('Expected "'.concat(token.name, '" to match "').concat(token.pattern, '", but got "').concat(segment, '"'));
             }
-            path += token.prefix + segment + token.suffix;
+            path2 += token.prefix + segment + token.suffix;
             continue;
           }
           if (optional)
@@ -16035,7 +16035,7 @@ var require_dist = __commonJS({
           var typeOfMessage = repeat ? "an array" : "a string";
           throw new TypeError('Expected "'.concat(token.name, '" to be ').concat(typeOfMessage));
         }
-        return path;
+        return path2;
       };
     }
     exports2.tokensToFunction = tokensToFunction;
@@ -16056,7 +16056,7 @@ var require_dist = __commonJS({
         var m = re.exec(pathname);
         if (!m)
           return false;
-        var path = m[0], index = m.index;
+        var path2 = m[0], index = m.index;
         var params = /* @__PURE__ */ Object.create(null);
         var _loop_1 = function(i2) {
           if (m[i2] === void 0)
@@ -16073,7 +16073,7 @@ var require_dist = __commonJS({
         for (var i = 1; i < m.length; i++) {
           _loop_1(i);
         }
-        return { path, index, params };
+        return { path: path2, index, params };
       };
     }
     exports2.regexpToFunction = regexpToFunction;
@@ -16083,12 +16083,12 @@ var require_dist = __commonJS({
     function flags(options) {
       return options && options.sensitive ? "" : "i";
     }
-    function regexpToRegexp(path, keys) {
+    function regexpToRegexp(path2, keys) {
       if (!keys)
-        return path;
+        return path2;
       var groupsRegex = /\((?:\?<(.*?)>)?(?!\?)/g;
       var index = 0;
-      var execResult = groupsRegex.exec(path.source);
+      var execResult = groupsRegex.exec(path2.source);
       while (execResult) {
         keys.push({
           // Use parenthesized substring match if available, index otherwise
@@ -16098,18 +16098,18 @@ var require_dist = __commonJS({
           modifier: "",
           pattern: ""
         });
-        execResult = groupsRegex.exec(path.source);
+        execResult = groupsRegex.exec(path2.source);
       }
-      return path;
+      return path2;
     }
     function arrayToRegexp(paths, keys, options) {
-      var parts = paths.map(function(path) {
-        return pathToRegexp(path, keys, options).source;
+      var parts = paths.map(function(path2) {
+        return pathToRegexp(path2, keys, options).source;
       });
       return new RegExp("(?:".concat(parts.join("|"), ")"), flags(options));
     }
-    function stringToRegexp(path, keys, options) {
-      return tokensToRegexp(parse(path, options), keys, options);
+    function stringToRegexp(path2, keys, options) {
+      return tokensToRegexp(parse(path2, options), keys, options);
     }
     function tokensToRegexp(tokens, keys, options) {
       if (options === void 0) {
@@ -16166,12 +16166,12 @@ var require_dist = __commonJS({
       return new RegExp(route, flags(options));
     }
     exports2.tokensToRegexp = tokensToRegexp;
-    function pathToRegexp(path, keys, options) {
-      if (path instanceof RegExp)
-        return regexpToRegexp(path, keys);
-      if (Array.isArray(path))
-        return arrayToRegexp(path, keys, options);
-      return stringToRegexp(path, keys, options);
+    function pathToRegexp(path2, keys, options) {
+      if (path2 instanceof RegExp)
+        return regexpToRegexp(path2, keys);
+      if (Array.isArray(path2))
+        return arrayToRegexp(path2, keys, options);
+      return stringToRegexp(path2, keys, options);
     }
     exports2.pathToRegexp = pathToRegexp;
   }
@@ -16183,7 +16183,7 @@ var require_layer = __commonJS({
     var { pathToRegexp, compile, parse } = require_dist();
     var { parse: parseUrl, format: formatUrl } = require("url");
     module2.exports = Layer;
-    function Layer(path, methods, middleware, opts) {
+    function Layer(path2, methods, middleware, opts) {
       this.opts = opts || {};
       this.name = this.opts.name || null;
       this.methods = [];
@@ -16198,16 +16198,16 @@ var require_layer = __commonJS({
         const type = typeof fn2;
         if (type !== "function")
           throw new Error(
-            `${methods.toString()} \`${this.opts.name || path}\`: \`middleware\` must be a function, not \`${type}\``
+            `${methods.toString()} \`${this.opts.name || path2}\`: \`middleware\` must be a function, not \`${type}\``
           );
       }
-      this.path = path;
-      this.regexp = pathToRegexp(path, this.paramNames, this.opts);
+      this.path = path2;
+      this.regexp = pathToRegexp(path2, this.paramNames, this.opts);
     }
-    Layer.prototype.match = function(path) {
-      return this.regexp.test(path);
+    Layer.prototype.match = function(path2) {
+      return this.regexp.test(path2);
     };
-    Layer.prototype.params = function(path, captures, existingParams) {
+    Layer.prototype.params = function(path2, captures, existingParams) {
       const params = existingParams || {};
       for (let len = captures.length, i = 0; i < len; i++) {
         if (this.paramNames[i]) {
@@ -16217,8 +16217,8 @@ var require_layer = __commonJS({
       }
       return params;
     };
-    Layer.prototype.captures = function(path) {
-      return this.opts.ignoreCaptures ? [] : path.match(this.regexp).slice(1);
+    Layer.prototype.captures = function(path2) {
+      return this.opts.ignoreCaptures ? [] : path2.match(this.regexp).slice(1);
     };
     Layer.prototype.url = function(params, options) {
       let args2 = params;
@@ -16322,15 +16322,15 @@ var require_router = __commonJS({
     }
     for (let i = 0; i < methods.length; i++) {
       let setMethodVerb2 = function(method) {
-        Router.prototype[method] = function(name, path, middleware) {
-          if (typeof path === "string" || path instanceof RegExp) {
+        Router.prototype[method] = function(name, path2, middleware) {
+          if (typeof path2 === "string" || path2 instanceof RegExp) {
             middleware = Array.prototype.slice.call(arguments, 2);
           } else {
             middleware = Array.prototype.slice.call(arguments, 1);
-            path = name;
+            path2 = name;
             name = null;
           }
-          this.register(path, [method], middleware, {
+          this.register(path2, [method], middleware, {
             name
           });
           return this;
@@ -16344,7 +16344,7 @@ var require_router = __commonJS({
     Router.prototype.use = function() {
       const router = this;
       const middleware = Array.prototype.slice.call(arguments);
-      let path;
+      let path2;
       if (Array.isArray(middleware[0]) && typeof middleware[0][0] === "string") {
         let arrPaths = middleware[0];
         for (let i = 0; i < arrPaths.length; i++) {
@@ -16354,7 +16354,7 @@ var require_router = __commonJS({
         return this;
       }
       const hasPath = typeof middleware[0] === "string";
-      if (hasPath) path = middleware.shift();
+      if (hasPath) path2 = middleware.shift();
       for (let i = 0; i < middleware.length; i++) {
         const m = middleware[i];
         if (m.router) {
@@ -16367,7 +16367,7 @@ var require_router = __commonJS({
               Object.create(Layer.prototype),
               nestedLayer
             );
-            if (path) cloneLayer.setPrefix(path);
+            if (path2) cloneLayer.setPrefix(path2);
             if (router.opts.prefix) cloneLayer.setPrefix(router.opts.prefix);
             router.stack.push(cloneLayer);
             cloneRouter.stack[j] = cloneLayer;
@@ -16387,7 +16387,7 @@ var require_router = __commonJS({
           const keys = [];
           pathToRegexp(router.opts.prefix || "", keys);
           const routerPrefixHasParam = router.opts.prefix && keys.length;
-          router.register(path || "([^/]*)", [], m, { end: false, ignoreCaptures: !hasPath && !routerPrefixHasParam });
+          router.register(path2 || "([^/]*)", [], m, { end: false, ignoreCaptures: !hasPath && !routerPrefixHasParam });
         }
       }
       return this;
@@ -16405,8 +16405,8 @@ var require_router = __commonJS({
       const router = this;
       let dispatch = function dispatch2(ctx, next) {
         debug("%s %s", ctx.method, ctx.path);
-        const path = router.opts.routerPath || ctx.routerPath || ctx.path;
-        const matched = router.match(path, ctx.method);
+        const path2 = router.opts.routerPath || ctx.routerPath || ctx.path;
+        const matched = router.match(path2, ctx.method);
         let layerChain;
         if (ctx.matched) {
           ctx.matched.push.apply(ctx.matched, matched.path);
@@ -16423,8 +16423,8 @@ var require_router = __commonJS({
         }
         layerChain = matchedLayers.reduce(function(memo, layer) {
           memo.push(function(ctx2, next2) {
-            ctx2.captures = layer.captures(path, ctx2.captures);
-            ctx2.params = ctx2.request.params = layer.params(path, ctx2.captures, ctx2.params);
+            ctx2.captures = layer.captures(path2, ctx2.captures);
+            ctx2.params = ctx2.request.params = layer.params(path2, ctx2.captures, ctx2.params);
             ctx2.routerPath = layer.path;
             ctx2.routerName = layer.name;
             ctx2._matchedRoute = layer.path;
@@ -16482,15 +16482,15 @@ var require_router = __commonJS({
         });
       };
     };
-    Router.prototype.all = function(name, path, middleware) {
-      if (typeof path === "string") {
+    Router.prototype.all = function(name, path2, middleware) {
+      if (typeof path2 === "string") {
         middleware = Array.prototype.slice.call(arguments, 2);
       } else {
         middleware = Array.prototype.slice.call(arguments, 1);
-        path = name;
+        path2 = name;
         name = null;
       }
-      this.register(path, methods, middleware, { name });
+      this.register(path2, methods, middleware, { name });
       return this;
     };
     Router.prototype.redirect = function(source, destination, code) {
@@ -16501,18 +16501,18 @@ var require_router = __commonJS({
         ctx.status = code || 301;
       });
     };
-    Router.prototype.register = function(path, methods2, middleware, opts) {
+    Router.prototype.register = function(path2, methods2, middleware, opts) {
       opts = opts || {};
       const router = this;
       const stack2 = this.stack;
-      if (Array.isArray(path)) {
-        for (let i = 0; i < path.length; i++) {
-          const curPath = path[i];
+      if (Array.isArray(path2)) {
+        for (let i = 0; i < path2.length; i++) {
+          const curPath = path2[i];
           router.register.call(router, curPath, methods2, middleware, opts);
         }
         return this;
       }
-      const route = new Layer(path, methods2, middleware, {
+      const route = new Layer(path2, methods2, middleware, {
         end: opts.end === false ? opts.end : true,
         name: opts.name,
         sensitive: opts.sensitive || this.opts.sensitive || false,
@@ -16546,7 +16546,7 @@ var require_router = __commonJS({
       }
       return new Error(`No route found for name: ${name}`);
     };
-    Router.prototype.match = function(path, method) {
+    Router.prototype.match = function(path2, method) {
       const layers = this.stack;
       let layer;
       const matched = {
@@ -16557,7 +16557,7 @@ var require_router = __commonJS({
       for (let len = layers.length, i = 0; i < len; i++) {
         layer = layers[i];
         debug("test %s %s", layer.path, layer.regexp);
-        if (layer.match(path)) {
+        if (layer.match(path2)) {
           matched.path.push(layer);
           if (layer.methods.length === 0 || ~layer.methods.indexOf(method)) {
             matched.pathAndMethod.push(layer);
@@ -16575,9 +16575,9 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router.url = function(path) {
+    Router.url = function(path2) {
       const args2 = Array.prototype.slice.call(arguments, 1);
-      return Layer.prototype.url.apply({ path }, args2);
+      return Layer.prototype.url.apply({ path: path2 }, args2);
     };
   }
 });
@@ -22781,7 +22781,7 @@ var require_co_body = __commonJS({
 var require_PersistentFile = __commonJS({
   "node_modules/formidable/src/PersistentFile.js"(exports2, module2) {
     "use strict";
-    var fs = require("fs");
+    var fs2 = require("fs");
     var crypto = require("crypto");
     var { EventEmitter } = require("events");
     var PersistentFile = class extends EventEmitter {
@@ -22798,7 +22798,7 @@ var require_PersistentFile = __commonJS({
         }
       }
       open() {
-        this._writeStream = new fs.WriteStream(this.filepath);
+        this._writeStream = new fs2.WriteStream(this.filepath);
         this._writeStream.on("error", (err) => {
           this.emit("error", err);
         });
@@ -22847,7 +22847,7 @@ var require_PersistentFile = __commonJS({
       }
       destroy() {
         this._writeStream.destroy();
-        fs.unlink(this.filepath, () => {
+        fs2.unlink(this.filepath, () => {
         });
       }
     };
@@ -24138,7 +24138,7 @@ var require_Formidable = __commonJS({
   "node_modules/formidable/src/Formidable.js"(exports2, module2) {
     "use strict";
     var os = require("os");
-    var path = require("path");
+    var path2 = require("path");
     var cuid2 = require_cuid2();
     var once = require_once();
     var dezalgo = require_dezalgo();
@@ -24181,7 +24181,7 @@ var require_Formidable = __commonJS({
       constructor(options = {}) {
         super();
         this.options = { ...DEFAULT_OPTIONS, ...options };
-        const dir = path.resolve(
+        const dir = path2.resolve(
           this.options.uploadDir || this.options.uploaddir || os.tmpdir()
         );
         this.uploaddir = dir;
@@ -24211,7 +24211,7 @@ var require_Formidable = __commonJS({
         }
         this.options.enabledPlugins.forEach((pluginName) => {
           const plgName = pluginName.toLowerCase();
-          this.use(require(path.join(__dirname, "plugins", `${plgName}.js`)));
+          this.use(require(path2.join(__dirname, "plugins", `${plgName}.js`)));
         });
         this._setUpMaxFields();
       }
@@ -24550,19 +24550,19 @@ var require_Formidable = __commonJS({
         if (!str) {
           return "";
         }
-        const basename = path.basename(str);
+        const basename = path2.basename(str);
         const firstDot = basename.indexOf(".");
         const lastDot = basename.lastIndexOf(".");
-        const extname = path.extname(basename).replace(/(\.[a-z0-9]+).*/i, "$1");
+        const extname = path2.extname(basename).replace(/(\.[a-z0-9]+).*/i, "$1");
         if (firstDot === lastDot) {
           return extname;
         }
         return basename.slice(firstDot, lastDot) + extname;
       }
       _joinDirectoryName(name) {
-        const newPath = path.join(this.uploadDir, name);
+        const newPath = path2.join(this.uploadDir, name);
         if (!newPath.startsWith(this.uploadDir)) {
-          return path.join(this.uploadDir, this.options.defaultInvalidName);
+          return path2.join(this.uploadDir, this.options.defaultInvalidName);
         }
         return newPath;
       }
@@ -24573,7 +24573,7 @@ var require_Formidable = __commonJS({
             let ext = "";
             let name = this.options.defaultInvalidName;
             if (part.originalFilename) {
-              ({ ext, name } = path.parse(part.originalFilename));
+              ({ ext, name } = path2.parse(part.originalFilename));
               if (this.options.keepExtensions !== true) {
                 ext = "";
               }
@@ -26093,8 +26093,8 @@ var require_immer_cjs_development = __commonJS({
       12: "Object.setPrototypeOf() cannot be used on an Immer draft",
       13: "Immer only supports deleting array indices",
       14: "Immer only supports setting array indices and the 'length' property",
-      15: function _(path) {
-        return "Cannot apply patch, path doesn't resolve: " + path;
+      15: function _(path2) {
+        return "Cannot apply patch, path doesn't resolve: " + path2;
       },
       16: 'Sets cannot have "replace" patches.',
       17: function _(op) {
@@ -26329,14 +26329,14 @@ var require_immer_cjs_development = __commonJS({
       }
       return result !== NOTHING ? result : void 0;
     }
-    function finalize(rootScope, value, path) {
+    function finalize(rootScope, value, path2) {
       if (isFrozen(value)) return value;
       var state = value[DRAFT_STATE];
       if (!state) {
         each(
           value,
           function(key, childValue) {
-            return finalizeProperty(rootScope, state, value, key, childValue, path);
+            return finalizeProperty(rootScope, state, value, key, childValue, path2);
           },
           true
           // See #590, don't recurse into non-enumerable of non drafted objects
@@ -26363,11 +26363,11 @@ var require_immer_cjs_development = __commonJS({
           isSet2 = true;
         }
         each(resultEach, function(key, childValue) {
-          return finalizeProperty(rootScope, state, result, key, childValue, path, isSet2);
+          return finalizeProperty(rootScope, state, result, key, childValue, path2, isSet2);
         });
         maybeFreeze(rootScope, result, false);
-        if (path && rootScope.patches_) {
-          getPlugin("Patches").generatePatches_(state, path, rootScope.patches_, rootScope.inversePatches_);
+        if (path2 && rootScope.patches_) {
+          getPlugin("Patches").generatePatches_(state, path2, rootScope.patches_, rootScope.inversePatches_);
         }
       }
       return state.copy_;
@@ -26375,9 +26375,9 @@ var require_immer_cjs_development = __commonJS({
     function finalizeProperty(rootScope, parentState, targetObject, prop, childValue, rootPath, targetIsSet) {
       if (childValue === targetObject) die(5);
       if (isDraft(childValue)) {
-        var path = rootPath && parentState && parentState.type_ !== 3 && // Set objects are atomic since they have no keys.
+        var path2 = rootPath && parentState && parentState.type_ !== 3 && // Set objects are atomic since they have no keys.
         !has(parentState.assigned_, prop) ? rootPath.concat(prop) : void 0;
-        var res = finalize(rootScope, childValue, path);
+        var res = finalize(rootScope, childValue, path2);
         set(targetObject, prop, res);
         if (isDraft(res)) {
           rootScope.canAutoFreeze_ = false;
@@ -26956,17 +26956,17 @@ var require_immer_cjs_development = __commonJS({
         }
         for (var i = 0; i < base_.length; i++) {
           if (assigned_[i] && copy_[i] !== base_[i]) {
-            var path = basePath2.concat([i]);
+            var path2 = basePath2.concat([i]);
             patches.push({
               op: REPLACE,
-              path,
+              path: path2,
               // Need to maybe clone it, as it can in fact be the original value
               // due to the base/copy inversion at the start of this function
               value: clonePatchValueIfNeeded(copy_[i])
             });
             inversePatches.push({
               op: REPLACE,
-              path,
+              path: path2,
               value: clonePatchValueIfNeeded(base_[i])
             });
           }
@@ -26996,25 +26996,25 @@ var require_immer_cjs_development = __commonJS({
           var value = get(copy_, key);
           var op = !assignedValue ? REMOVE : has(base_, key) ? REPLACE : ADD;
           if (origValue === value && op === REPLACE) return;
-          var path = basePath2.concat(key);
+          var path2 = basePath2.concat(key);
           patches.push(op === REMOVE ? {
             op,
-            path
+            path: path2
           } : {
             op,
-            path,
+            path: path2,
             value
           });
           inversePatches.push(op === ADD ? {
             op: REMOVE,
-            path
+            path: path2
           } : op === REMOVE ? {
             op: ADD,
-            path,
+            path: path2,
             value: clonePatchValueIfNeeded(origValue)
           } : {
             op: REPLACE,
-            path,
+            path: path2,
             value: clonePatchValueIfNeeded(origValue)
           });
         });
@@ -27024,15 +27024,15 @@ var require_immer_cjs_development = __commonJS({
         var i = 0;
         base_.forEach(function(value) {
           if (!copy_.has(value)) {
-            var path = basePath2.concat([i]);
+            var path2 = basePath2.concat([i]);
             patches.push({
               op: REMOVE,
-              path,
+              path: path2,
               value
             });
             inversePatches.unshift({
               op: ADD,
-              path,
+              path: path2,
               value
             });
           }
@@ -27041,15 +27041,15 @@ var require_immer_cjs_development = __commonJS({
         i = 0;
         copy_.forEach(function(value) {
           if (!base_.has(value)) {
-            var path = basePath2.concat([i]);
+            var path2 = basePath2.concat([i]);
             patches.push({
               op: ADD,
-              path,
+              path: path2,
               value
             });
             inversePatches.unshift({
               op: REMOVE,
-              path,
+              path: path2,
               value
             });
           }
@@ -27070,22 +27070,22 @@ var require_immer_cjs_development = __commonJS({
       }
       function applyPatches_(draft, patches) {
         patches.forEach(function(patch) {
-          var path = patch.path, op = patch.op;
+          var path2 = patch.path, op = patch.op;
           var base = draft;
-          for (var i = 0; i < path.length - 1; i++) {
+          for (var i = 0; i < path2.length - 1; i++) {
             var parentType = getArchtype(base);
-            var p = path[i];
+            var p = path2[i];
             if (typeof p !== "string" && typeof p !== "number") {
               p = "" + p;
             }
             if ((parentType === 0 || parentType === 1) && (p === "__proto__" || p === "constructor")) die(24);
             if (typeof base === "function" && p === "prototype") die(24);
             base = get(base, p);
-            if (typeof base !== "object") die(15, path.join("/"));
+            if (typeof base !== "object") die(15, path2.join("/"));
           }
           var type = getArchtype(base);
           var value = deepClonePatchValue(patch.value);
-          var key = path[path.length - 1];
+          var key = path2[path2.length - 1];
           switch (op) {
             case REPLACE:
               switch (type) {
@@ -33291,11 +33291,11 @@ var require_server = __commonJS({
       attach(server2, options) {
         const self = this;
         options = options || {};
-        let path = (options.path || "/engine.io").replace(/\/$/, "");
+        let path2 = (options.path || "/engine.io").replace(/\/$/, "");
         const destroyUpgradeTimeout = options.destroyUpgradeTimeout || 1e3;
-        path += "/";
+        path2 += "/";
         function check(req) {
-          return path === req.url.substr(0, path.length);
+          return path2 === req.url.substr(0, path2.length);
         }
         const listeners = server2.listeners("request").slice(0);
         server2.removeAllListeners("request");
@@ -33303,7 +33303,7 @@ var require_server = __commonJS({
         server2.on("listening", self.init.bind(self));
         server2.on("request", function(req, res) {
           if (check(req)) {
-            debug('intercepting request for path "%s"', path);
+            debug('intercepting request for path "%s"', path2);
             self.handleRequest(req, res);
           } else {
             let i = 0;
@@ -35560,7 +35560,7 @@ var require_dist5 = __commonJS({
     var zlib_1 = require("zlib");
     var accepts = require_accepts();
     var stream_1 = require("stream");
-    var path = require("path");
+    var path2 = require("path");
     var engine = require_engine_io();
     var client_1 = require_client();
     var events_1 = require("events");
@@ -35770,7 +35770,7 @@ var require_dist5 = __commonJS({
        * @private
        */
       static sendFile(filename, req, res) {
-        const readStream = fs_1.createReadStream(path.join(__dirname, "../client-dist/", filename));
+        const readStream = fs_1.createReadStream(path2.join(__dirname, "../client-dist/", filename));
         const encoding = accepts(req).encodings(["br", "gzip", "deflate"]);
         const onError = (err) => {
           if (err) {
@@ -36816,10 +36816,10 @@ var require_pointer = __commonJS({
           }
           this.tokens = tokens;
         }
-        Pointer2.fromJSON = function(path) {
-          var tokens = path.split("/").map(unescapeToken);
+        Pointer2.fromJSON = function(path2) {
+          var tokens = path2.split("/").map(unescapeToken);
           if (tokens[0] !== "")
-            throw new Error("Invalid JSON Pointer: ".concat(path));
+            throw new Error("Invalid JSON Pointer: ".concat(path2));
           return new Pointer2(tokens);
         };
         Pointer2.prototype.toString = function() {
@@ -37122,9 +37122,9 @@ var require_patch = __commonJS({
       /** @class */
       (function(_super) {
         __extends(MissingError2, _super);
-        function MissingError2(path) {
-          var _this = _super.call(this, "Value required at path: ".concat(path)) || this;
-          _this.path = path;
+        function MissingError2(path2) {
+          var _this = _super.call(this, "Value required at path: ".concat(path2)) || this;
+          _this.path = path2;
           _this.name = "MissingError";
           return _this;
         }
@@ -37301,10 +37301,10 @@ var require_rfc6902 = __commonJS({
       return (diff ? wrapVoidableDiff(diff) : diff_1.diffAny)(input, output, ptr);
     }
     exports2.createPatch = createPatch;
-    function createTest(input, path) {
-      var endpoint = pointer_1.Pointer.fromJSON(path).evaluate(input);
+    function createTest(input, path2) {
+      var endpoint = pointer_1.Pointer.fromJSON(path2).evaluate(input);
       if (endpoint !== void 0) {
-        return { op: "test", path, value: endpoint.value };
+        return { op: "test", path: path2, value: endpoint.value };
       }
     }
     function createTests(input, patch) {
@@ -42027,6 +42027,9 @@ var require_core = __commonJS({
 
 // src/server.ts
 var import_server = __toESM(require_server2(), 1);
+var import_path = __toESM(require("path"), 1);
+var import_fs = __toESM(require("fs"), 1);
+var import_koa_static = __toESM(require("koa-static"), 1);
 
 // src/game/Singularity.ts
 var import_core3 = __toESM(require_core(), 1);
@@ -42597,9 +42600,20 @@ var server = (0, import_server.Server)({
     "http://127.0.0.1:5173"
   ]
 });
-var PORT = Number(process.env.PORT) || 8001;
+var PORT = Number(process.env.PORT) || 8e3;
+var distPath = import_path.default.resolve(process.cwd(), "dist");
+server.app.use((0, import_koa_static.default)(distPath));
+var indexHtml = import_path.default.join(distPath, "index.html");
+server.app.use(async (ctx, next) => {
+  await next();
+  if (ctx.status === 404 && !ctx.path.startsWith("/games") && !ctx.path.startsWith("/socket.io") && !ctx.path.startsWith("/.well-known")) {
+    ctx.type = "html";
+    ctx.body = import_fs.default.createReadStream(indexHtml);
+  }
+});
 server.run({ port: PORT, callback: () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
+  console.log(`Serving static files from ${distPath}`);
   console.log(`Lobby API available at http://localhost:${PORT}/games`);
 } });
 /*! Bundled license information:

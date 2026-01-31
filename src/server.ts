@@ -1,5 +1,7 @@
 import { Server, Origins } from 'boardgame.io/server';
 import path from 'path';
+import fs from 'fs';
+import serve from 'koa-static';
 import { Singularity } from './game';
 
 const server = Server({
@@ -17,18 +19,18 @@ const server = Server({
 
 const PORT = Number(process.env.PORT) || 8000;
 
-// Serve static files from Vite build output
+// Serve static files from Vite build output (boardgame.io uses Koa)
 const distPath = path.resolve(process.cwd(), 'dist');
-const express = await import('express');
-server.app.use(express.default.static(distPath));
+server.app.use(serve(distPath));
 
-// SPA fallback - serve index.html for any non-API route
-server.app.get('*', (req: any, res: any, next: any) => {
-  // Don't intercept boardgame.io API routes
-  if (req.path.startsWith('/games') || req.path.startsWith('/socket.io')) {
-    return next();
+// SPA fallback - serve index.html for non-API, non-file routes
+const indexHtml = path.join(distPath, 'index.html');
+server.app.use(async (ctx, next) => {
+  await next();
+  if (ctx.status === 404 && !ctx.path.startsWith('/games') && !ctx.path.startsWith('/socket.io') && !ctx.path.startsWith('/.well-known')) {
+    ctx.type = 'html';
+    ctx.body = fs.createReadStream(indexHtml);
   }
-  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 server.run({ port: PORT, callback: () => {

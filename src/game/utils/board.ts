@@ -35,8 +35,16 @@ export function generateTiles(numPlayers: number, random: RandomAPI): Tile[] {
   const shuffledTiles = random.Shuffle(tiles);
 
   // Assign resource types (ensure minimum per type)
-  const metalCount = Math.ceil(shuffledTiles.length / 2);
-  const organicCount = shuffledTiles.length - metalCount;
+  const totalTiles = shuffledTiles.length;
+  const minPerType = config.minResourcesPerType;
+  
+  // Ensure minimum per type, distribute remaining randomly
+  const remainingTiles = totalTiles - (2 * minPerType);
+  const bonusMetalTiles = remainingTiles > 0 ? Math.floor(remainingTiles / 2) : 0;
+  const bonusOrganicTiles = remainingTiles - bonusMetalTiles;
+  
+  const metalCount = minPerType + bonusMetalTiles;
+  const organicCount = minPerType + bonusOrganicTiles;
 
   const resourceTypes: ('metal' | 'organic')[] = [
     ...Array(metalCount).fill('metal'),

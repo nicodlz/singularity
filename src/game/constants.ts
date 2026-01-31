@@ -98,7 +98,7 @@ export const TILE_CONFIG: Record<string, {
 export const INITIAL_RESOURCES: Resources = {
   metal: 0,
   organic: 0,
-  energy: 3,  // Starting energy to deploy initial probes
+  energy: 3,  // Start with 3 to deploy all 3 initial probes on turn 1
   alloy: 0,
   biomass: 0,
   plasma: 0,

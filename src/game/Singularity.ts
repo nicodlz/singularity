@@ -1,16 +1,19 @@
 import type { Game, Ctx } from 'boardgame.io';
 import { TurnOrder } from 'boardgame.io/core';
-import type { GameState, GameOver } from './types';
+import type { GameState, GameOver, BuildingType } from './types';
 import { setupGame } from './setup';
 import { VICTORY_INTELLIGENCE } from './constants';
 import { onProductionBegin, onControlBegin } from './phases';
+import { calculateTileControl } from './utils/control';
 import {
   rollProbes,
   deployProbes,
   recallProbe,
+  endDeployment,
   buildBuilding,
   buildProbe,
   activateBuilding,
+  endConstruction,
 } from './moves';
 
 export const Singularity: Game<GameState> = {
@@ -23,48 +26,31 @@ export const Singularity: Game<GameState> = {
   },
 
   phases: {
-    // Single phase: Players take turns doing everything (deploy + build)
-    main: {
+    // Phase 1: Production (automatic)
+    production: {
       start: true,
       onBegin: ({ G }) => {
-        // Production at start of round
         onProductionBegin({ G });
-        G.playersFinishedPhase = [];
       },
-      moves: {
-        // Deployment moves
-        rollProbes,
-        deployProbes,
-        recallProbe,
-        // End deployment (allows construction phase)
-        endDeployment: ({ G }: { G: GameState }) => {
-          G.deploymentComplete = true;
-        },
-        // Construction moves
-        buildBuilding,
-        buildProbe,
-        activateBuilding,
-        // End turn (finishes construction and passes to next player)
-        endTurn: ({ G, ctx, events }: { G: GameState; ctx: Ctx; events: { endTurn: () => void } }) => {
-          const playerId = ctx.currentPlayer;
-
-          // Mark player as finished
-          if (!G.playersFinishedPhase.includes(playerId)) {
-            G.playersFinishedPhase.push(playerId);
-          }
-
-          // Reset state for next player
-          G.rolledDice = false;
-          G.diceValues = [];
-          G.deployedValues = [];
-          G.deploymentComplete = false;
-
-          events.endTurn();
-        },
-      },
+      moves: {},
       turn: {
         order: TurnOrder.DEFAULT,
         minMoves: 0,
+      },
+      endIf: () => true, // Ends immediately 
+      next: 'deployment',
+    },
+
+    // Phase 2: Probe deployment (players take turns)
+    deployment: {
+      moves: {
+        rollProbes,
+        deployProbes,
+        recallProbe,
+        endDeployment,
+      },
+      turn: {
+        order: TurnOrder.DEFAULT,
         onBegin: ({ G }) => {
           // Reset state at start of each player's turn
           G.rolledDice = false;
@@ -74,17 +60,50 @@ export const Singularity: Game<GameState> = {
         },
       },
       endIf: ({ G, ctx }) => {
+        // All players have finished deployment
         return G.playersFinishedPhase.length >= ctx.numPlayers;
       },
       onEnd: ({ G }) => {
-        // Control & Harvest at end of round (after all players played)
-        onControlBegin({ G });
-        // Increment round
-        G.round += 1;
-        // Clear for next round
         G.playersFinishedPhase = [];
       },
-      next: 'main',
+      next: 'control',
+    },
+
+    // Phase 4: Control and harvest (automatic)
+    control: {
+      onBegin: ({ G }) => {
+        onControlBegin({ G });
+      },
+      moves: {},
+      turn: {
+        order: TurnOrder.DEFAULT,
+        minMoves: 0,
+      },
+      endIf: () => true, // Ends immediately
+      next: 'construction',
+    },
+
+    // Phase 6: Construction (players take turns)
+    construction: {
+      moves: {
+        buildBuilding,
+        buildProbe,
+        activateBuilding,
+        endConstruction,
+      },
+      turn: {
+        order: TurnOrder.DEFAULT,
+      },
+      endIf: ({ G, ctx }) => {
+        // All players have finished construction
+        return G.playersFinishedPhase.length >= ctx.numPlayers;
+      },
+      onEnd: ({ G }) => {
+        // Increment round and reset for next round
+        G.round += 1;
+        G.playersFinishedPhase = [];
+      },
+      next: 'production',
     },
   },
 
@@ -141,6 +160,27 @@ export const Singularity: Game<GameState> = {
       if (ctx.phase === 'construction') {
         moves.push({ move: 'endConstruction' });
         moves.push({ move: 'buildProbe' });
+
+        // Add building construction moves for controlled tiles
+        for (const tile of G.tiles) {
+          const control = calculateTileControl(tile, G.players);
+          if (control.controller === playerId) {
+            const buildingTypes: BuildingType[] = [
+              'windTurbine', 'factory', 'orbitalForge', 'bioLab', 
+              'condenser', 'chipEngraver', 'biomassFactory', 'turret'
+            ];
+            for (const buildingType of buildingTypes) {
+              moves.push({ move: 'buildBuilding', args: [buildingType, tile.id] });
+            }
+          }
+        }
+
+        // Add building activation moves
+        for (const building of player.buildings) {
+          if (!building.activated) {
+            moves.push({ move: 'activateBuilding', args: [building.id] });
+          }
+        }
       }
 
       return moves;

@@ -14,7 +14,7 @@ const server = Server({
   ],
 });
 
-const PORT = Number(process.env.PORT) || 8001;
+const PORT = Number(process.env.PORT) || 8000;
 
 server.run({ port: PORT, callback: () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
